@@ -1,0 +1,29 @@
+{
+  "_comment": "乐享 OpenAPI 上传配置模板。多策略架构：一个策略一个文件，放在 skill 的 configs/ 目录下（如 configs/default.json、configs/prod-saas.json、configs/私有化-min.json；configs/* 已被 .gitignore 忽略，仅本模板会提交）。执行时 --config configs/<策略名>.json 指定；省略则用 configs/default.json。",
+  "_必填": "api_base + staff_id + source + space_id（auth_mode=app_key 时另需 app_key/app_secret；auth_mode=bearer 时另需 access_token）。策略必须自包含，配齐后可零参数运行（适合定时任务）。例外：配了 html_entry_path 的私有化策略由 parent_entry 定位目标，可不填 space_id，但必须填 parent_entry_id。",
+  "_可选": "parent_entry_id（目标父目录）、extra_query（随每次请求追加的 query，如 company_from）、staff_header（默认 x-staff-id）、timeout、headers（额外请求头，仅特殊网关需要，会加到发往网关的每个请求）、upload_params_path / upload_params_template / cos_put_url_template / html_entry_path（网关路由与私有化差异，见 SKILL.md「私有化环境」与 references/upload-api-cookbook.md）。",
+  "_凭证来源": "app_key/app_secret 在乐享管理后台【开发-接口凭证管理】创建，勾选接口权限：本地文件上传/上传文件/重新上传文件/创建文件夹/获取知识库详情/删除知识节点；staff_id 需对目标空间有 editor 及以上角色。字段值支持 env:VAR 形式从环境变量读取（token 不落盘）。",
+  "_manifest": "幂等状态按策略隔离：configs/foo.json → manifests/foo.json。",
+
+  "api_base": "https://lxapi.lexiangla.com",
+  "auth_mode": "app_key",
+
+  "app_key": "<your_app_key>",
+  "app_secret": "<your_app_secret>",
+  "access_token": "<auth_mode=bearer 时必填：Bearer token 本体，支持 env:LEXIANG_TOKEN>",
+
+  "staff_id": "<your_staff_id>",
+
+  "source": "<必填：源端，HTML 文件或目录路径（支持 ~）>",
+  "space_id": "<必填：目的端，目标空间ID>",
+  "parent_entry_id": "<可选：目的端，目标父目录 entry_id，缺省建在空间根目录>",
+
+  "extra_query": {},
+  "upload_params_path": "/cgi-bin/v1/kb/files/upload-params",
+  "upload_params_template": {
+    "name": "{name}",
+    "media_type": "{media_type}"
+  },
+  "cos_put_url_template": "",
+  "html_entry_path": ""
+}
